@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BiSearch, BiBuildings, BiMap } from "react-icons/bi";
 import { IoLogoTwitter } from "react-icons/io";
 import { debounce } from "lodash";
@@ -20,7 +20,6 @@ interface User {
 
 function App() {
   const [username, setUsername] = useState<string>("");
-  const [userSearch, setUserSearch] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const [user, setUser] = useState<User | undefined>(undefined);
 
@@ -30,6 +29,9 @@ function App() {
       : new Date(user?.created_at).toDateString();
 
   const handleChangeUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === "") {
+      setUser(undefined);
+    }
     debouncedInput(e.target.value);
   };
 
@@ -37,25 +39,6 @@ function App() {
     debounce((name: string) => setUsername(name), 500),
     []
   );
-
-  const handleClickSubmitButton = () => {
-    setUserSearch(username);
-  };
-
-  const buttonSubmit = useRef() as React.MutableRefObject<HTMLButtonElement>;
-
-  useEffect(() => {
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.keyCode === 13) {
-        buttonSubmit.current.click();
-      }
-    };
-
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -93,11 +76,7 @@ function App() {
                 onChange={handleChangeUsername}
               />
             </div>
-            <button
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-[40px] h-[40px] rounded-full bg-400 flex"
-              onClick={handleClickSubmitButton}
-              ref={buttonSubmit}
-            >
+            <button className="absolute right-2 top-1/2 -translate-y-1/2 w-[40px] h-[40px] rounded-full bg-400 flex">
               <BiSearch className="m-auto text-lg text-white" />
             </button>
           </div>

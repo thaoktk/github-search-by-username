@@ -11,6 +11,7 @@ specifiers:
   '@types/react-dom': ^17.0.14
   axios: ^0.26.1
   lodash: ^4.17.21
+  pnpm: ^6.32.3
   react: ^17.0.2
   react-dom: ^17.0.2
   react-icons: ^4.3.1
@@ -29,6 +30,7 @@ dependencies:
   '@types/react-dom': 17.0.14
   axios: 0.26.1
   lodash: 4.17.21
+  pnpm: 6.32.3
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-icons: 4.3.1_react@17.0.2
@@ -6781,6 +6783,12 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       find-up: 3.0.0
+    dev: false
+
+  /pnpm/6.32.3:
+    resolution: {integrity: sha512-lMQgROSwiUA+kt+suAPinjNwqevS1Iz0rppWNZ3jHhzeP07RFRQ+Ksai2OlAnM+YjlbHT9niQ4ICBVSqcdQ04w==}
+    engines: {node: '>=12.17'}
+    hasBin: true
     dev: false
 
   /portfinder/1.0.28:
