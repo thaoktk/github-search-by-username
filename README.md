@@ -1,4 +1,4 @@
 # Github Search by Username
 ## Create by thaoktk
 
-Enter your username or another username so It will show the account and some information of this guy to you.
+Enter a Github username and it will show some information about the account.
