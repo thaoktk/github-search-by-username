@@ -1,7 +1,8 @@
 import axios from "axios";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { BiSearch, BiBuildings, BiMap } from "react-icons/bi";
 import { IoLogoTwitter } from "react-icons/io";
+import { debounce } from "lodash";
 
 interface User {
   avatar_url: string | undefined;
@@ -29,8 +30,13 @@ function App() {
       : new Date(user?.created_at).toDateString();
 
   const handleChangeUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+    debouncedInput(e.target.value);
   };
+
+  const debouncedInput = useCallback(
+    debounce((name: string) => setUsername(name), 500),
+    []
+  );
 
   const handleClickSubmitButton = () => {
     setUserSearch(username);
@@ -54,9 +60,9 @@ function App() {
   useEffect(() => {
     const getUsers = async () => {
       try {
-        if (userSearch) {
+        if (username) {
           const res = await axios.get(
-            `https://api.github.com/users/${userSearch}`
+            `https://api.github.com/users/${username}`
           );
           setUser(res.data);
           setError(false);
@@ -67,13 +73,13 @@ function App() {
       }
     };
     getUsers();
-  }, [userSearch]);
+  }, [username]);
 
   return (
-    <div className="bg-bg min-h-screen min-w-full flex justify-center items-center">
-      <div className="max-w-screen-xl md:px-0 px-5 py-10 ">
+    <div className="flex items-center justify-center min-w-full min-h-screen bg-bg">
+      <div className="max-w-screen-xl px-5 py-10 md:px-0 ">
         <div className="">
-          <h1 className="text-3xl text-white font-medium text-center">
+          <h1 className="text-3xl font-medium text-center text-white">
             Github Search by Username
           </h1>
         </div>
@@ -84,7 +90,6 @@ function App() {
                 className="border-none outline-none bg-200 py-3 px-5 rounded-full md:w-[580px] w-full text-lg text-white"
                 type="text"
                 placeholder="Search"
-                value={username}
                 onChange={handleChangeUsername}
               />
             </div>
@@ -93,12 +98,12 @@ function App() {
               onClick={handleClickSubmitButton}
               ref={buttonSubmit}
             >
-              <BiSearch className="text-white text-lg m-auto" />
+              <BiSearch className="m-auto text-lg text-white" />
             </button>
           </div>
           {error && (
             <div className="mt-8 introduce bg-100 md:w-[580px] w-full py-8 md:px-8 px-5 rounded-[50px] shadow-[4px_8px_25px_0_rgba(53, 60, 87,0.5)]">
-              <h1 className="text-white text-xl text-center">
+              <h1 className="text-xl text-center text-white">
                 This user is not available.
               </h1>
             </div>
@@ -106,7 +111,7 @@ function App() {
           {user && (
             <div className="mt-8 introduce">
               <div className="bg-100 md:w-[580px] w-full py-8 md:px-8 px-5 rounded-[50px] shadow-[4px_8px_25px_0_rgba(53, 60, 87,0.5)]">
-                <div className="flex md:flex-row flex-col md:gap-8 gap-4 items-center">
+                <div className="flex flex-col items-center gap-4 md:flex-row md:gap-8">
                   <div>
                     <img
                       src={user?.avatar_url}
@@ -114,70 +119,70 @@ function App() {
                       className="w-[90px] h-[90px] rounded-full border-2 border-white"
                     />
                   </div>
-                  <div className="md:block flex flex-col items-center">
-                    <span className="text-2xl text-white font-semibold block">
+                  <div className="flex flex-col items-center md:block">
+                    <span className="block text-2xl font-semibold text-white">
                       {user?.name ? user?.name : "Not Available"}
                     </span>
-                    <span className="text-400 italic text-lg block md:mt-2">
+                    <span className="block text-lg italic text-400 md:mt-2">
                       {`@${user?.login}`}
                     </span>
                   </div>
-                  <div className="flex-1 text-right text-white text-md italic">
+                  <div className="flex-1 italic text-right text-white text-md">
                     Join: {dateJoinGit}
                   </div>
                 </div>
-                <div className="mt-7 text-center text-white font-light">
+                <div className="font-light text-center text-white mt-7">
                   {user?.bio}
                 </div>
-                <div className="mt-7 flex flex-col gap-4 md:gap-0 md:flex-row justify-around">
+                <div className="flex flex-col justify-around gap-4 mt-7 md:gap-0 md:flex-row">
                   <div className="flex flex-col items-center gap-4">
-                    <span className="text-lg text-white font-medium">
+                    <span className="text-lg font-medium text-white">
                       Repos
                     </span>
-                    <span className="text-lg text-white font-medium">
+                    <span className="text-lg font-medium text-white">
                       {user?.public_repos}
                     </span>
                   </div>
-                  <div className="w-px min-h-full bg-200 hidden md:block"></div>
-                  <div className="w-1/2 h-px bg-200 block md:hidden mx-auto"></div>
+                  <div className="hidden w-px min-h-full bg-200 md:block"></div>
+                  <div className="block w-1/2 h-px mx-auto bg-200 md:hidden"></div>
                   <div className="flex flex-col items-center gap-4">
-                    <span className="text-lg text-white font-medium">
+                    <span className="text-lg font-medium text-white">
                       Followers
                     </span>
-                    <span className="text-lg text-white font-medium">
+                    <span className="text-lg font-medium text-white">
                       {user?.followers}
                     </span>
                   </div>
-                  <div className="w-px min-h-full bg-200 hidden md:block"></div>
-                  <div className="w-1/2 h-px bg-200 block md:hidden mx-auto"></div>
+                  <div className="hidden w-px min-h-full bg-200 md:block"></div>
+                  <div className="block w-1/2 h-px mx-auto bg-200 md:hidden"></div>
                   <div className="flex flex-col items-center gap-4">
-                    <span className="text-lg text-white font-medium">
+                    <span className="text-lg font-medium text-white">
                       Following
                     </span>
-                    <span className="text-lg text-white font-medium">
+                    <span className="text-lg font-medium text-white">
                       {user?.following}
                     </span>
                   </div>
                 </div>
-                <div className="mt-7 flex flex-col md:flex-row gap-5 md:gap-0 justify-around items-center">
-                  <div className="flex gap-4 justify-center items-center flex-1">
-                    <span className="text-300 text-lg">
+                <div className="flex flex-col items-center justify-around gap-5 mt-7 md:flex-row md:gap-0">
+                  <div className="flex items-center justify-center flex-1 gap-4">
+                    <span className="text-lg text-300">
                       <BiBuildings />
                     </span>
                     <span className="text-lg text-white">
                       {user?.company ? user?.company : "Not Available"}
                     </span>
                   </div>
-                  <div className="flex gap-4 justify-center items-center flex-1">
-                    <span className="text-300 text-lg">
+                  <div className="flex items-center justify-center flex-1 gap-4">
+                    <span className="text-lg text-300">
                       <BiMap />
                     </span>
                     <span className="text-lg text-white">
                       {user?.location ? user?.location : "Not Available"}
                     </span>
                   </div>
-                  <div className="flex gap-4 justify-center items-center flex-1">
-                    <span className="text-300 text-lg">
+                  <div className="flex items-center justify-center flex-1 gap-4">
+                    <span className="text-lg text-300">
                       <IoLogoTwitter />
                     </span>
                     <span className="text-lg text-white">
